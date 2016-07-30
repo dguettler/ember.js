@@ -367,6 +367,36 @@ QUnit.test('defining templateName allows other templates to be rendered', functi
   equal(jQuery('.alert-box', '#qunit-fixture').text(), 'Invader!', 'Template for alert was render into outlet');
 });
 
+QUnit.test('defining templateName and custom render with options only honors given templateName', function() {
+  Router.map(function() {
+    this.route('home', { path: '/' });
+  });
+
+  setTemplate('alert', compile(
+    '<div class=\'alert-box\'>Invader!</div>'
+  ));
+  setTemplate('application', compile(
+    '<p>APPLICATION</p>{{outlet \'alert\'}}'
+  ));
+
+  App.HomeController = Controller.extend();
+  App.HomeRoute = Route.extend({
+    templateName: 'alert',
+    renderTemplate() {
+      this.render({
+        into: 'application',
+        outlet: 'alert'
+      });
+    }
+  });
+
+  bootApplication();
+
+  console.log(jQuery('#qunit-fixture').text());
+
+  equal(jQuery('.alert-box', '#qunit-fixture').text(), 'Invader!', 'alert was rendered into outlet');
+});
+
 QUnit.test('The Homepage with a `setupController` hook', function() {
   Router.map(function() {
     this.route('home', { path: '/' });
