@@ -1,17 +1,12 @@
 import { Template } from 'glimmer-runtime';
 
-let templateId = 0;
-
 class Wrapper {
-  static create(options) {
-    return new this(options);
-  }
-
-  constructor({ env }, id) {
+  constructor(id, env, spec) {
     this.id = id;
+    this.env = env;
+    this.spec = spec;
     this._entryPoint = null;
     this._layout = null;
-    this.env = env;
   }
 
   asEntryPoint() {
@@ -33,15 +28,18 @@ class Wrapper {
   }
 }
 
+let templateId = 0;
+
 export default function template(json) {
-  let id = templateId++;
+  let id = ++templateId;
 
   let Factory = class extends Wrapper {
-    constructor(options) {
-      super(options, id);
-      this.spec = JSON.parse(json);
+    static create(options) {
+      let { env } = options;
+      return new this(id, env, JSON.parse(json));
     }
   };
+
   Factory.id = id;
 
   return Factory;
